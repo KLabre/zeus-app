@@ -1,0 +1,70 @@
+parameters:
+  - name: variable_group
+    type: string
+  - name: k8sNamespace
+    type: string
+  - name: dockerRegistryServiceConnection
+    type: string
+  - name: imageRepository
+    type: string
+  - name: containerRegistry
+    type: string
+  - name: aks_environment
+    type: string
+  - name: kubernetesServiceConnection
+    type: string
+  - name: azureSubscription
+    type: string
+
+jobs:
+  - deployment: Deploy
+    displayName: Deploy Image to Kubernetes
+    variables:
+      - group: ${{ parameters.variable_group }}
+    pool:
+      vmImage: "$(vmImage)"
+    environment: ${{ parameters.aks_environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: Docker@2
+              displayName: Login to ACR
+              inputs:
+                command: login
+                containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+
+            - task: KubernetesManifest@1
+              displayName: Create Image Pull Secret
+              inputs:
+                kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
+                action: createSecret
+                secretName: $(imagePullSecret)
+                namespace: ${{ parameters.k8sNamespace }}
+                dockerRegistryEndpoint: ${{ parameters.dockerRegistryServiceConnection }}
+
+            - task: Kubernetes@1
+              displayName: Deploy to Kubernetes
+              inputs:
+                kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
+                action: deploy
+                namespace: ${{ parameters.k8sNamespace }}
+                manifests: |
+                  $(Pipeline.Workspace)/manifests/templates/spec-deployment-${{ parameters.environment }}.yml
+                  $(Pipeline.Workspace)/manifests/templates/spec-service-${{ parameters.environment }}.yml
+                imagePullSecrets: |
+                  $(imagePullSecret)
+                containers: |
+                  ${{ parameters.containerRegistry }}/${{ parameters.imageRepository }}:${{ variables.appTag }}
+
+            - task: AzureCLI@2
+              displayName: Purge Old Images
+              inputs:
+                azureSubscription: ${{ parameters.azureSubscription }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  REGISTRY=${{ parameters.containerRegistry }}
+                  REPOSITORY=${{ parameters.imageRepository }}
+                  PURGE_CMD="acr purge --filter '$REPOSITORY:.*App\b' --ago 7d"
+                  az acr run --cmd "$PURGE_CMD" registry $REGISTRY /dev/null

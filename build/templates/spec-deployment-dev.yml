@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kl-zeus-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kl-zeus-app
+  template:
+    metadata:
+      labels:
+        app: kl-zeus-app
+    spec:
+      securityCOntext:
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: zeus-app-container
+          image: "acrzeusdev.azurecr.io/zeusappdev"
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "250m" # 0.25 vCPU
+            limits:
+              cpu: "500m" # 0.5 vCPU

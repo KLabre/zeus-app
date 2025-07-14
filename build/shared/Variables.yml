@@ -1,0 +1,21 @@
+variables:
+  - name: appTag
+    value: "$(Build.BuildId)-App"
+
+  - name: appSourcePath
+    value: "/src"
+
+  - name: appBuildPath
+    value: "$(AppSourcePath)/build"
+
+  - name: dockerFilePath
+    value: "$(AppSourcePath)/Dockerfile"
+
+  - name: imagePullSecret
+    value: "acr-auth"
+
+  - name: vmImage
+    value: "ubuntu-latest"
+
+  - name: envName
+    value: "$(REACT_APP_ENV)"

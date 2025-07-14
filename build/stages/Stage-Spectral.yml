@@ -1,0 +1,23 @@
+stages:
+  - stage: Spectral
+    variables:
+      - group: Spectral
+    displayName: "Spectral Security Scan"
+    jobs:
+      - job: SpectralScan
+        displayName: "Run Spectral Security Scan"
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - script: curl -L 'https://spectral-eu.checkpoint.com/latest/x/sh?dsn=$(DevOps-Spectral-DSN)' | sh
+            displayName: "Download Spectral"
+          - script: |
+              $HOME/.spectral/spectral scan --dsn $(DevOps-Spectral-DSN) --engines secrets,iac,oss --include-tags base,audit,iac --fail-on-error
+              exit_code=$?
+              if [ $exit_code -ne 0 ]; then
+                echo "Spectral scan failed with exit code $exit_code"
+                exit $exit_code
+              else
+                echo "Spectral scan completed successfully"
+              fi
+            displayName: "Run Spectral Scan"

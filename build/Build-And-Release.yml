@@ -1,0 +1,33 @@
+trigger:
+  batch: false
+  branches:
+    include:
+      - main
+      - develop
+
+  paths:
+    exclude:
+      - build/*
+
+# Let's trigger a nightly build
+# So that we are always scanning for issues, making sure it builds and deploys
+schedules:
+  # Cron is scheduled in UTC. So 5pm UTC is 2am Sydney (UTC+10)
+  - cron: "00 16 * * *"
+    displayName: Nightly Build
+    branches:
+      include:
+        - main
+        - develop
+    always: true
+name: $(data:yyyyMMdd)$(rev:.r)
+
+variables:
+  - template: shared/Variables.yml
+
+stages:
+  # TODO: static DevSecOps analysis
+  # template: stages/Stage-Spectral.yml
+  - template: stages/Stage-Deploy-Development.yml
+  #- template: stages/Stage-Deploy-UAT.yml # --> (a.k.a Staging) will not be applicable, but you get the idea
+  #- template: stages/Stage-Deploy-Production.yml # --> will not be applicable, but you get the idea

@@ -1,0 +1,38 @@
+stages:
+  - stage: BuildAndTestDevelopment
+    displayName: Build and Test Development
+    # Not applicable now, because we are going straight to main, this will be important for multi-branch targeting multi-environments pipelines
+    # condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/main'))
+    condition: succeeded()
+
+    # We will apply this at a later stage, for now we are just building and testing
+    #dependsOn:
+    #- Spectral
+
+    jobs:
+      - template: ../jobs/Job-Build-And-Test.yml
+        parameters:
+          dockerRegistryServiceConnection: acr-zeus-dev
+          variable_group_keyvault: zeus-kv-dev
+          imageRepository: zeusapidev
+          envFileName: zeus-dev.env
+# TODO: deploy
+#  - stage: DeployDevelopment
+#    displayName: Deploy Development
+#    # Not applicable now, because we are going straight to main, this will be important for multi-branch targeting multi-environments pipelines
+#    # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+#    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+#    dependsOn:
+#      - BuildAndTestDevelopment
+#    jobs:
+#      - template: ../jobs/Job-Deploy-Image.yml
+#        parameters:
+#          variable_group: zeus-kv-dev
+#          k8sNamespace: "default"
+#          dockerRegistryServiceConnection: acr-zeus-dev
+#          imageRepository: zeusapidev
+#          containerRegistry: "acrzeusdev.azurecr.io"
+#          environment: dev
+#          aks_environment: "aks-zeus-dev"
+#          kubernetesServiceConnection: "aks-zeus-dev"
+#          azureSubscription: "kl-zeus-development"

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kl-zeus-app
+spec:
+  selector:
+    app: kl-zeus-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: zeus-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # Let's Encrypt issuer
+spec:
+  tls:
+    - hosts:
+        - app-dev.example.com # TODO: Replace with domain
+      secretName: kl-zeus-app-tls # Secret for TLS certificate
+  rules:
+    - host: app-dev.example.com # TODO: Replace with domain
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kl-zeus-service
+                port:
+                  number: 80
+          - path: /api-swagger-doc(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kl-zeus-service
+                port:
+                  number: 80
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kl-zeus-app
+                port:
+                  number: 80

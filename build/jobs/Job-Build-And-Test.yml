@@ -1,0 +1,115 @@
+parameters:
+  - name: dockerRegistryServiceConnection
+    type: string
+  - name: variable_group_keyvault
+    type: string
+  - name: imageRepository
+    type: string
+  - name: envFileName
+    type: string
+
+jobs:
+  - job: BuildAndTest
+    displayName: Build And Test
+    variables:
+      - group: ${{ parameters.variable_group_keyvault }}
+    workspace:
+      clean: all
+
+    steps:
+      - powershell: 'Write-Host "##vso[build.addbuildtag]Nightly"'
+        displayName: "Tag Nightly Builds"
+        condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))
+
+      - checkout: self
+        clean: true
+
+      - task: Docker@2
+        displayName: Login to acr
+        inputs:
+          command: login
+          containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+
+      - task: NodeTool@0
+        displayName: "Install Node.js"
+        inputs:
+          versionSpec: "24.x"
+          checkLatest: true
+
+      - task: PowerShell@2
+        displayName: "Debug Workspace Files"
+        inputs:
+          targetType: "inline"
+          script: |
+            Get-ChildItem -Path "$(System.DefaultWorkingDirectory)" -Recurse | foreach-object { $_.FullName }
+
+      - task: DownloadSecureFile@1
+        displayName: "Download Environment File"
+        inputs:
+          secureFile: ${{ parameters.envFileName }}
+
+      - task: PowerShell@2
+        displayName: "Copy Environment File to Source Path"
+        inputs:
+          targetType: "inline"
+          script: CopyItem -Path $(env.secureFilePath) -Destination "$(System.DefaultWorkingDirectory)/$(appSourcePath)/.env"
+
+      - powershell: |
+          pushd "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
+          npm install
+          popd
+        displayName: "Install Node.js Dependencies"
+
+      - powershell: |
+          pushd "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
+          npm run lint
+          popd
+        displayName: "Run Static Analysis"
+
+      - powershell: |
+          pushd "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
+          npm test --watchAll=false --coverage --coverageDirectory=test-results/coverage --collectionCoverageFrom 'src/components/**/*.{js,jsx,ts,tsx}' --reporters=default --reporters=jest-junit
+          popd
+        displayName: "Run Tests"
+
+      - task: PublishTestResults@2
+        displayName: "Publish Test Results"
+        inputs:
+          testResultsFormat: "JUnit"
+          testResultsFiles: "$(System.DefaultWorkingDirectory)/$(appSourcePath)/test-results/junit.xml"
+          failIfNoTests: true
+          searchFolder: "$(System.DefaultWorkingDirectory)/$(appSourcePath)/test-results"
+
+      - task: Docker@2
+        displayName: "Build Docker Image"
+        inputs:
+          command: build
+          repository: ${{ parameters.imageRepository }}
+          dockerfile: "$(System.DefaultWorkingDirectory)/$(dockerFilePath)"
+          buildContext: "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
+          containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+          tags: |
+            $(appTag)
+
+      - task: Docker@2
+        displayName: "Push Docker Image"
+        inputs:
+          command: push
+          repository: ${{ parameters.imageRepository }}
+          containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+          tags: |
+            $(appTag)
+
+      - task: CopyFiles@2
+        displayName: "Copy Build Output"
+        inputs:
+          SourceFolder: "$(System.DefaultWorkingDirectory)/$(appSourcePath)/build"
+          Contents: "**/*.yml"
+          TargetFolder: "$(Pipeline.Workspace)/manifests"
+
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish Build Artifacts"
+        inputs:
+          targetPath: "$(Pipeline.Workspace)/manifests"
+          artifact: "manifests"
+          publishLocation: "pipeline"

@@ -15,3 +15,6 @@ thumb
 sketch
 
 **/.env
+
+**/.react-router/**
+**/coverage/**

@@ -1,7 +1,9 @@
-// import i18n;
-import './i18n';
-
+// import Libraries;
+import './i18n/i18n';
+import './app.css';
 import React from 'react';
+import { MsalProvider } from '@azure/msal-react';
+import { PublicClientApplication } from '@azure/msal-browser';
 
 import {
   isRouteErrorResponse,
@@ -12,8 +14,22 @@ import {
   ScrollRestoration,
 } from 'react-router';
 
+// import hooks
+import { useTranslation } from 'react-i18next';
+import { useInitializeMsal } from './lib/hooks/useInitializeMsal';
+
+// import types
+import { msalConfig } from './lib/types/authConfig';
+
+// import contexts
+import { AuthProvider } from './lib/contexts/AuthContext';
+
+// import routes and components
 import type { Route } from './+types/root';
-import './app.css';
+import { PageLayout } from './components/layout/PageLayout';
+import AppLoader from './components/loading/AppLoader';
+
+const msalInstance = new PublicClientApplication(msalConfig);
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -47,18 +63,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  // Let's configure the authentication before React Renders
+  // This will keep the session consistent across tabs, automatically setting the active account, and avoiding race conditions during login
+  const msalReady = useInitializeMsal(msalInstance);
+
+  if (!msalReady) return <AppLoader />;
+
+  return (
+    <MsalProvider instance={msalInstance}>
+      <AuthProvider>
+        <PageLayout>
+          <Outlet />
+        </PageLayout>
+      </AuthProvider>
+    </MsalProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!';
-  let details = 'An unexpected error occurred.';
+  const { t } = useTranslation();
+
+  let message = t('error.default.message');
+  let details = t('error.default.details');
+
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error';
-    details =
-      error.status === 404 ? 'The requested page could not be found.' : error.statusText || details;
+    message = error.status === 404 ? t('error.notFound.message') : 'Error';
+    details = error.status === 404 ? t('error.notFound.details') : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;

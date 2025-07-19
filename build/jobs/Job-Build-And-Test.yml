@@ -44,6 +44,7 @@ jobs:
             Get-ChildItem -Path "$(System.DefaultWorkingDirectory)" -Recurse | foreach-object { $_.FullName }
 
       - task: DownloadSecureFile@1
+        name: env
         displayName: "Download Environment File"
         inputs:
           secureFile: ${{ parameters.envFileName }}
@@ -52,7 +53,7 @@ jobs:
         displayName: "Copy Environment File to Source Path"
         inputs:
           targetType: "inline"
-          script: CopyItem -Path $(env.secureFilePath) -Destination "$(System.DefaultWorkingDirectory)/$(appSourcePath)/.env"
+          script: Copy-Item -Path $(env.secureFilePath) -Destination "$(System.DefaultWorkingDirectory)/$(appSourcePath)/.env"
 
       - powershell: |
           pushd "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
@@ -62,9 +63,15 @@ jobs:
 
       - powershell: |
           pushd "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
+          npm audit --audit-level=moderate
+          popd
+        displayName: "Run Dependency Audit"
+
+      - powershell: |
+          pushd "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
           npm run lint
           popd
-        displayName: "Run Static Analysis"
+        displayName: "Run Linter"
 
       - powershell: |
           pushd "$(System.DefaultWorkingDirectory)/$(appSourcePath)"
@@ -103,7 +110,7 @@ jobs:
       - task: CopyFiles@2
         displayName: "Copy Build Output"
         inputs:
-          SourceFolder: "$(System.DefaultWorkingDirectory)/$(appSourcePath)/build"
+          SourceFolder: "$(System.DefaultWorkingDirectory)/build"
           Contents: "**/*.yml"
           TargetFolder: "$(Pipeline.Workspace)/manifests"
 

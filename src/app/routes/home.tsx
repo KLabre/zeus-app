@@ -1,10 +1,7 @@
 // Import components
-import { Welcome } from '../components/welcome/welcome';
+import Dashboard from '../components/Dashboard/Dashboard';
 
-export function meta() {
-  return [{ title: 'Zeus App' }, { name: 'description', content: 'Welcome to Zeus!' }];
-}
-
+// This route will render the Dashboard component as home page for authenticated users
 export default function Home() {
-  return <Welcome />;
+  return <Dashboard />;
 }

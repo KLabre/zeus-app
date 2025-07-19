@@ -10,7 +10,6 @@ import jestPlugin from 'eslint-plugin-jest';
 
 export default [
   js.configs.recommended,
-
   // Standard TS rules
   {
     files: ['**/*.ts', '**/*.tsx'],
@@ -37,6 +36,9 @@ export default [
       ...pluginJsxA11y.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
+      'jsx-a11y/anchor-is-valid': 'error',
+      'jsx-a11y/no-autofocus': 'warn', // optional
+      'jsx-a11y/label-has-associated-control': 'error',
     },
     settings: {
       react: {

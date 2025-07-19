@@ -39,7 +39,7 @@ describe('SignOut', () => {
     // ARRANGE
     render(<SignOut />);
 
-    //
+    // ASSERT
     expect(screen.getByRole('button', { name: 'auth.signOut' })).toBeInTheDocument();
   });
 

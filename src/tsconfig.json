@@ -3,11 +3,14 @@
     "**/*",
     "**/.server/**/*",
     "**/.client/**/*",
-    ".react-router/types/**/*"
+    ".react-router/types/**/*",
+    "jest.setup.ts"
   ],
   "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true, // Ensure that JavaScript files are checked by TypeScript
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["node", "vite/client"],
+    "types": ["node", "jest", "@testing-library/jest-dom", "vite/client"],
     "target": "ES2022",
     "module": "ES2022",
     "moduleResolution": "bundler",

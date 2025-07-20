@@ -1,15 +1,23 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tailwindcss/utilities'; /* includes all utilities */
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  font-family: var(--font-sans);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+html.dark {
+  @apply bg-white dark:bg-slate-950;
+  color: white;
 }

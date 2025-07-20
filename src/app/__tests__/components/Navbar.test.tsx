@@ -9,7 +9,7 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 import { describe, expect, test, beforeEach, jest } from '@jest/globals';
 
 // import component
-import Navbar from '../../components/Navbar/Navbar';
+import Navbar from '../../components/navbar/Navbar';
 
 expect.extend(toHaveNoViolations);
 

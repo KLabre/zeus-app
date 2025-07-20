@@ -11,9 +11,9 @@ const Home: React.FC = () => {
   const { t } = useTranslation();
   return (
     <>
-      <div className="pt-16 p-4 container mx-auto">
+      <div className="container mx-auto p-4 pt-16">
         <main className="flex items-center justify-center pt-16 pb-4">
-          <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
+          <div className="flex min-h-0 flex-1 flex-col items-center gap-16">
             <header className="flex flex-col items-center gap-9">
               <div className="w-[500px] max-w-[100vw] p-4"></div>
               <p className="text-7xl">{t('app.title')}</p>

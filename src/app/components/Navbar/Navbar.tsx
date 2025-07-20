@@ -1,28 +1,20 @@
 // src/components/Navbar.tsx
 import React from 'react';
 
-// Import components
-import { Link } from 'react-router'; // If you're using react-router for navigation
-import Button from '../Button/Button';
+// import components
+import Stack from '@mui/material/Stack';
 import SignOut from '../auth/SignOut';
+import ThemeToggle from './ThemeToggle';
+import AppLogo from './AppLogo';
 
-interface NavbarProps {
-  onToggleTheme: () => void;
-  isDarkMode: boolean;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ onToggleTheme, isDarkMode }) => {
+const Navbar: React.FC = () => {
   return (
-    <nav className="bg-gray-800 p-2 sm:p-2 flex justify-between items-center shadow-md">
-      <Link to="/" className="flex items-center">
-        <img src="/images/zeus-logo-dark.png" alt="Logo" className="w-20 mr-2" />
-      </Link>
-      <div className="flex items-center space-x-4">
-        <Button onClick={onToggleTheme} type="outline">
-          {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-        </Button>
+    <nav className="flex items-center justify-between bg-white p-2 shadow-md sm:p-2 dark:bg-slate-950">
+      <AppLogo />
+      <Stack direction="row" spacing={2}>
+        <ThemeToggle />
         <SignOut />
-      </div>
+      </Stack>
     </nav>
   );
 };

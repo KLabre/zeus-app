@@ -23,6 +23,7 @@ import { msalConfig } from './lib/types/authConfig';
 
 // import contexts
 import { AuthProvider } from './lib/contexts/AuthContext';
+import { ThemeProvider } from './lib/contexts/ThemeContext';
 
 // import routes and components
 import type { Route } from './+types/root';
@@ -67,15 +68,22 @@ export default function App() {
   // This will keep the session consistent across tabs, automatically setting the active account, and avoiding race conditions during login
   const msalReady = useInitializeMsal(msalInstance);
 
-  if (!msalReady) return <AppLoader />;
+  if (!msalReady)
+    return (
+      <ThemeProvider>
+        <AppLoader />
+      </ThemeProvider>
+    );
 
   return (
     <MsalProvider instance={msalInstance}>
-      <AuthProvider>
-        <PageLayout>
-          <Outlet />
-        </PageLayout>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <PageLayout>
+            <Outlet />
+          </PageLayout>
+        </AuthProvider>
+      </ThemeProvider>
     </MsalProvider>
   );
 }
@@ -97,11 +105,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="container mx-auto p-4 pt-16">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
+        <pre className="w-full overflow-x-auto p-4">
           <code>{stack}</code>
         </pre>
       )}

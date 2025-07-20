@@ -19,6 +19,16 @@ export default [
       parserOptions: {
         project: './tsconfig.json',
       },
+      globals: {
+        window: 'readonly',
+        console: 'readonly',
+        clearTimeout: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        navigator: 'readonly',
+        setTimeout: 'readonly',
+      },
     },
   },
 
@@ -29,6 +39,18 @@ export default [
       react: pluginReact,
       'react-hooks': pluginReactHooks,
       'jsx-a11y': pluginJsxA11y,
+    },
+    languageOptions: {
+      globals: {
+        window: 'readonly',
+        console: 'readonly',
+        clearTimeout: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        navigator: 'readonly',
+        setTimeout: 'readonly',
+      },
     },
     rules: {
       ...pluginReact.configs.recommended.rules,

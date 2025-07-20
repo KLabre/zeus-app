@@ -4,9 +4,6 @@ export default {
       title: 'Zeus App',
       description: 'Welcome to Zeus!',
     },
-    welcome: {
-      title: 'Welcome {{name}}',
-    },
     auth: {
       signIn: 'Sign In',
       signOut: 'Sign Out',
@@ -20,6 +17,15 @@ export default {
         message: '404 Not Found',
         details: 'The page you are looking for does not exist.',
       },
+    },
+    navbar: {
+      theme: {
+        light: 'Light',
+        dark: 'Dark',
+      },
+    },
+    welcome: {
+      title: 'Welcome {{name}}',
     },
   },
 };

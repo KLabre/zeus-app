@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 // import components
 import SignIn from '../auth/SignIn';
+import ErrorBoundary from '../error/ErrorBoundary';
 
 // This component serves as the home page for unauthenticated users
 const Home: React.FC = () => {
@@ -18,7 +19,9 @@ const Home: React.FC = () => {
               <div className="w-[500px] max-w-[100vw] p-4"></div>
               <p className="text-7xl">{t('app.title')}</p>
               <p className="text-3xl">{t('app.description')}</p>
-              <SignIn />
+              <ErrorBoundary>
+                <SignIn />
+              </ErrorBoundary>
             </header>
           </div>
         </main>

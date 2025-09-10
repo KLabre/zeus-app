@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router';
 
 // import hooks
-import { useTheme } from '~/lib/contexts/ThemeContext';
+import { useTheme } from '../../lib/contexts/ThemeContext';
 
 const AppLogo: React.FC = () => {
   const { mode } = useTheme();

@@ -51,6 +51,9 @@ On your local machine, replace the contents of /src/.env with your values.
 Template:
 
 ```env
+VITE_APP_ENVIRONMENT=local
+VITE_APP_NAMESPACE='zeus-app'
+
 VITE_MSAL_CLIENT_ID=<your-azure-entra-external-id-app-registration-client-id>
 VITE_MSAL_AUTHORITY='https://<your-domain>.ciamlogin.com/'
 VITE_MSAL_REDIRECT_URI='http://localhost:5173/'

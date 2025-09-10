@@ -17,4 +17,4 @@ sketch
 **/.env
 
 **/.react-router/**
-**/coverage/**
+**/src/coverage/**

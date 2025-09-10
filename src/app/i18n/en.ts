@@ -13,6 +13,9 @@ export default {
         message: 'Oops!',
         details: 'Something went wrong. Please try again later.',
       },
+      errorBoundaryFallback: {
+        message: '<bold>Oops!</bold> Something went wrong here. Please refresh.',
+      },
       notFound: {
         message: '404 Not Found',
         details: 'The page you are looking for does not exist.',
